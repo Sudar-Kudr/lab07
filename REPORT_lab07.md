@@ -1,0 +1,153 @@
+## Laboratory work VII
+
+Данная лабораторная работа посвещена изучению систем управления пакетами на примере **Hunter**
+
+```sh
+$ open https://github.com/ruslo/hunter
+```
+
+## Tasks
+
+- [ok] 1. Создать публичный репозиторий с названием **lab07** на сервисе **GitHub**
+- [ok] 2. Выполнить инструкцию учебного материала
+- [ok] 3. Ознакомиться со ссылками учебного материала
+- [ok] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
+
+## Tutorial
+
+```sh
+$ export GITHUB_USERNAME=<имя_пользователя>   #присваиваем имя пользователя GitHub в переменную GITHUB_USERNAME
+$ alias gsed=sed                             #заменяем команду sed на gsed
+```
+
+```sh
+$ cd ${GITHUB_USERNAME}/workspace   #спускаемся в workspace
+$ pushd .                          #добавляем в стек текущий каталог
+$ source scripts/activate         #выполняем скрипт
+```
+
+```sh
+$ git clone https://github.com/${GITHUB_USERNAME}/lab06 projects/lab07   #клонируем репозиторий из lab06 в директорию projects/lab07
+$ cd projects/lab07                                                     #переходим директорию projects/lab05
+$ git remote remove origin                                             #удаляем старую ссылку репозитория
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab07   #добавляем ссылку репозитория в управление репозиториями
+```
+
+```sh
+$ mkdir -p cmake                                                                        #создаем директорию cmake
+$ wget https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake -O  # cmake/HunterGate.cmake
+$ gsed -i -e '/cmake_minimum_required(VERSION 3.4)/a\                                 #добавляем текст после указанной строки
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.251.tar.gz"
+    SHA1 "5659b15dc0884d4b03dbd95710e6a1fa0fc3258d"
+)
+' CMakeLists.txt
+```
+
+```sh
+$ git rm -rf third-party/gtest                                        #удаляем директорию third-party/gtest через git
+$ gsed -i -e '/set(PRINT_VERSION_STRING "v\${PRINT_VERSION}")/a\      #добавляем текст после указанной строки
+
+hunter_add_package(GTest)
+find_package(GTest CONFIG REQUIRED)
+' CMakeLists.txt
+$ gsed -i -e 's/add_subdirectory(third-party/gtest)//' CMakeLists.txt   #удаляем строку
+$ gsed -i -e 's/gtest_main/GTest::main/' CMakeLists.txt                 #заменим строки
+```
+
+```sh
+$ cmake -H. -B_builds -DBUILD_TESTS=ON     #меняем значение переменной BUILD TESTS на ON
+$ cmake --build _builds                     #запускаем сборку
+$ cmake --build _builds --target test        #запускаем сборку test
+$ ls -la $HOME/.hunter                        #выводим информацию о файле .hunter
+```
+
+```sh
+$ git clone https://github.com/cpp-pm/hunter $HOME/projects/hunter      #клонируем репозиторий по ссылке в директорию $HOME/projects/hunter
+$ export HUNTER_ROOT=$HOME/projects/hunter                             #добавляем новый путь к переменной PATH
+$ rm -rf _builds                                                      #удаляем папку _builds
+$ cmake -H. -B_builds -DBUILD_TESTS=ON
+$ cmake --build _builds                                              #запускаем сборку
+$ cmake --build _builds --target test                               #запускаем сборку test
+```
+
+```sh
+$ cat $HUNTER_ROOT/cmake/configs/default.cmake | grep GTest      #вывод в консоль указанного файла. Вывод только строк, содержащих подстроку GTest
+$ cat $HUNTER_ROOT/cmake/projects/GTest/hunter.cmake            #выводим данные файла hunter.cmake
+$ mkdir cmake/Hunter                                           #создаем в директории cmake папку Hunter
+$ cat > cmake/Hunter/config.cmake <<EOF                       #создаем и записываем файл config.cmake в директории Hunter
+hunter_config(GTest VERSION 1.7.0-hunter-9)
+EOF
+# add LOCAL in HunterGate function
+```
+
+```sh
+$ mkdir demo                    #создаем в директорию demo
+$ cat > demo/main.cpp <<EOF    #создаем и записываем файл main.cpp в директории demo
+#include <print.hpp>
+
+#include <cstdlib>
+
+int main(int argc, char* argv[])
+{
+  const char* log_path = std::getenv("LOG_PATH");
+  if (log_path == nullptr)
+  {
+    std::cerr << "undefined environment variable: LOG_PATH" << std::endl;
+    return 1;
+  }
+  std::string text;
+  while (std::cin >> text)
+  {
+    std::ofstream out{log_path, std::ios_base::app};
+    print(text, out);
+    out << std::endl;
+  }
+}
+EOF
+
+$ gsed -i -e '/endif()/a\                #добавляем в CMakeLists.txt данные
+
+add_executable(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo/main.cpp)
+target_link_libraries(demo print)
+install(TARGETS demo RUNTIME DESTINATION bin)
+' CMakeLists.txt
+```
+
+```sh
+$ mkdir tools                                                     #создаем в директорию tools
+$ git submodule add https://github.com/ruslo/polly tools/polly   #добавляем утилиту polly
+$ tools/polly/bin/polly.py --test                               #тестируем через утилиту polly
+$ tools/polly/bin/polly.py --install                           #устанавливаем
+$ tools/polly/bin/polly.py --toolchain clang-cxx14            #запускаем toolchain clang-cxx14
+```
+
+## Report
+
+```sh
+$ popd                                                                           #удаляем из стека текущий каталог
+$ export LAB_NUMBER=07                                                          #присваиваем 07 в переменную LAB_NUMBER
+$ git clone https://github.com/tp-labs/lab${LAB_NUMBER} tasks/lab${LAB_NUMBER} #клонируем из ссылки в директорию (в нашем случае-tasks/lab07)
+$ mkdir reports/lab${LAB_NUMBER}                                              #создаем в директории reports папку (в нашем случае- lab07) 
+$ cp tasks/lab${LAB_NUMBER}/README.md reports/lab${LAB_NUMBER}/REPORT.md     #копируем из одной директории в другую
+$ cd reports/lab${LAB_NUMBER}                                               #спускаемся в директорию (в наше случае- lab07)
+$ edit REPORT.md                                                           #редактируем REPORT.md
+$ gist REPORT.md                                                          #сохраняем REPORT.md
+```
+
+## Homework
+
+### Задание
+1. Создайте cвой hunter-пакет.
+
+## Links
+
+- [Create Hunter package](https://docs.hunter.sh/en/latest/creating-new/create.html)
+- [Custom Hunter config](https://github.com/ruslo/hunter/wiki/example.custom.config.id)
+- [Polly](https://github.com/ruslo/polly)
+
+```
+Copyright (c) 2015-2021 The ISC Authors
+```
