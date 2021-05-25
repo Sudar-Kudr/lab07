@@ -38,11 +38,11 @@ $ mkdir -p cmake                                                                
 $ wget https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake -O  # cmake/HunterGate.cmake
 $ gsed -i -e '/cmake_minimum_required(VERSION 3.4)/a\                                 #добавляем текст после указанной строки
 
-include("cmake/HunterGate.cmake")
-HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.251.tar.gz"
-    SHA1 "5659b15dc0884d4b03dbd95710e6a1fa0fc3258d"
-)
+include("cmake/HunterGate.cmake") \
+HunterGate( \
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.251.tar.gz" \
+    SHA1 "5659b15dc0884d4b03dbd95710e6a1fa0fc3258d" \
+) \
 ' CMakeLists.txt
 ```
 
@@ -50,10 +50,10 @@ HunterGate(
 $ git rm -rf third-party/gtest                                        #удаляем директорию third-party/gtest через git
 $ gsed -i -e '/set(PRINT_VERSION_STRING "v\${PRINT_VERSION}")/a\      #добавляем текст после указанной строки
 
-hunter_add_package(GTest)
-find_package(GTest CONFIG REQUIRED)
+hunter_add_package(GTest) \
+find_package(GTest CONFIG REQUIRED) \
 ' CMakeLists.txt
-$ gsed -i -e 's/add_subdirectory(third-party/gtest)//' CMakeLists.txt   #удаляем строку
+$ gsed -i -e 's/add_subdirectory(third-party/gtest)/' CMakeLists.txt   #удаляем строку
 $ gsed -i -e 's/gtest_main/GTest::main/' CMakeLists.txt                 #заменим строки
 ```
 
